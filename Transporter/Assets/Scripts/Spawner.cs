@@ -4,32 +4,34 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Stuff _template;
+    [SerializeField] private GameObject _template;
     [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private float _speed;
+
+    private List<Transform> _transforms;
 
     private int time = 0;
     private int timer = 120;
 
-    private List<Stuff> stuffs;
-
     private void Start()
     {
-        stuffs = new List<Stuff>();
-        
+        _transforms = new List<Transform>();
     }
     private void Update()
     {
         if (time >= timer)
         {
             time = 0;
-            stuffs.Add(Instantiate(_template, _spawnPoint.position + new Vector3(Random.Range(-9, 9), 0, 0), Quaternion.identity));
+            Instantiate(_template, _spawnPoint.position + new Vector3(Random.Range(-9, 9), 10, 0), Quaternion.identity);
         }
         time++;
 
-        foreach(Stuff s in stuffs)
-            if (s.IsColliding)
-            {
-                s.Speed = 2f;
-            }
+        foreach (Transform transform in _transforms)
+            transform.position += Vector3.forward * _speed * Time.deltaTime;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        _transforms.Add(collision.gameObject.GetComponent<Transform>());
     }
 }
